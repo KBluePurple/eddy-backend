@@ -1,19 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
-  imports: [
-    MongooseModule.forRoot(
-      '',
-    ),
-  ],
+  imports: [LeaderboardModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  getRankings(count: number, offset: number): string {
-    return `Rankings: ${count} ${offset}`;
-  }
-}
+export class AppModule {}
