@@ -9,7 +9,7 @@ export class TimeRankingElement {
   @Prop()
   leader: User;
   @Prop()
-  team: User[];
+  members: User[];
   @Prop()
   teamId: string;
   @Prop()

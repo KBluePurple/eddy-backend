@@ -2,13 +2,26 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 
 interface SteamUser {
-  steamId: string;
+  steamid: string;
 }
 
 interface AuthenticateUserTicketResult {
   success: boolean;
   steamUser: SteamUser;
 }
+
+interface LobbyDataSuccess {
+  success: true;
+  lobbyId: string;
+  owner: SteamUser;
+  members: SteamUser[];
+}
+
+interface LobbyDataFailure {
+  success: false;
+}
+
+type LobbyData = LobbyDataSuccess | LobbyDataFailure;
 
 @Injectable()
 export class SteamService {
@@ -34,7 +47,7 @@ export class SteamService {
         return {
           success: true,
           steamUser: {
-            steamId: steamId,
+            steamid: steamId,
           },
         };
       }
@@ -42,6 +55,38 @@ export class SteamService {
     return {
       success: false,
       steamUser: null,
+    };
+  }
+
+  static async getRoomData(roomId: string): Promise<LobbyData> {
+    const response = await axios.get(
+      'https://partner.steam-api.com/ILobbyMatchmakingService/GetLobbyData/v1/',
+      {
+        params: {
+          key: process.env.STEAM_API_KEY,
+          appid: process.env.STEAM_APP_ID,
+          steamid_lobby: roomId,
+        },
+      },
+    );
+    if (response.status === 200) {
+      const data = response.data.response.params;
+      const owner = data.steamid_owner as string;
+      const members = data.members as SteamUser[];
+
+      return {
+        success: true,
+        lobbyId: roomId,
+        owner: {
+          steamid: owner,
+        },
+        members: members.map((member) => ({
+          steamid: member.steamid,
+        })),
+      };
+    }
+    return {
+      success: false,
     };
   }
 }

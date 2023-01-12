@@ -5,6 +5,8 @@ export class SubmitLeaderboardDto {
   teamId: string;
   @IsString()
   ticket: string;
+  @IsString()
+  lobbyId: string;
   @IsNumber()
   time: number;
 }

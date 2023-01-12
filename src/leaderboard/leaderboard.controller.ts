@@ -12,7 +12,7 @@ export class LeaderboardController {
   }
 
   @Post()
-  async submitRanking(@Body() { teamId, ticket, time }: SubmitLeaderboardDto) {
-    return await this.leaderboardService.submitRanking(teamId, ticket, time);
+  async submitRanking(@Body() submitLeaderboardDto: SubmitLeaderboardDto) {
+    return await this.leaderboardService.submitRanking(submitLeaderboardDto);
   }
 }

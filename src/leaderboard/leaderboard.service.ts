@@ -4,10 +4,12 @@ import { InjectConnection } from '@nestjs/mongoose';
 import { TimeRankingElement } from '../schemas/timeRankingElement.schema';
 import { User } from '../schemas/user.schema';
 import { SteamService } from '../steam/steam.service';
+import { SubmitLeaderboardDto } from './dto/submit-leaderboard.dto';
 
 @Injectable()
 export class LeaderboardService {
   private collection: Collection<TimeRankingElement>;
+
   constructor(@InjectConnection() private connection: Connection) {
     const db = this.connection.useDb('rankings');
     this.collection = db.collection('time');
@@ -18,21 +20,28 @@ export class LeaderboardService {
     return JSON.stringify(rankings);
   }
 
-  async submitRanking(
-    teamId: string,
-    ticket: string,
-    time: number,
-  ): Promise<string> {
+  async submitRanking(data: SubmitLeaderboardDto): Promise<string> {
     const newRanking = new TimeRankingElement();
-    newRanking.time = time;
-    newRanking.teamId = teamId;
+    newRanking.time = data.time;
+    newRanking.teamId = data.teamId;
     newRanking.leader = new User();
 
-    const authResult = await SteamService.getSteamUser(ticket);
-    if (authResult.success === true) {
-      newRanking.leader.steamId = authResult.steamUser.steamId;
+    const authResult = await SteamService.getSteamUser(data.ticket);
+    if (authResult.success) {
+      newRanking.leader.steamid = authResult.steamUser.steamid;
     } else {
       throw new HttpException('Invalid ticket', 401);
+    }
+
+    const roomData = await SteamService.getRoomData(data.lobbyId);
+    if (roomData.success) {
+      if (roomData.owner.steamid !== newRanking.leader.steamid) {
+        throw new HttpException('Not the room owner', 401);
+      } else {
+        newRanking.members = roomData.members;
+      }
+    } else {
+      throw new HttpException('Invalid room', 401);
     }
 
     const result = await this.collection.insertOne(newRanking);
