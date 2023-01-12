@@ -1,5 +1,6 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { LeaderboardService } from './leaderboard.service';
+import { SubmitLeaderboardDto } from './dto/submit-leaderboard.dto';
 
 @Controller('leaderboard')
 export class LeaderboardController {
@@ -9,8 +10,9 @@ export class LeaderboardController {
   async getLeaderboard() {
     return this.leaderboardService.getRankings();
   }
+
   @Post()
-  async submitRanking() {
-    return await this.leaderboardService.submitRanking();
+  async submitRanking(@Body() { teamId, ticket, time }: SubmitLeaderboardDto) {
+    return await this.leaderboardService.submitRanking(teamId, ticket, time);
   }
 }

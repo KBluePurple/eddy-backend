@@ -11,9 +11,9 @@ export class TimeRankingElement {
   @Prop()
   team: User[];
   @Prop()
-  roomId: string;
+  teamId: string;
   @Prop()
-  time: Date;
+  time: number;
 }
 
 export const TimeRankingElementSchema =
