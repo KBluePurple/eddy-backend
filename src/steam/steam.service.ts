@@ -59,34 +59,37 @@ export class SteamService {
   }
 
   static async getRoomData(roomId: string): Promise<LobbyData> {
-    const response = await axios.get(
-      'https://partner.steam-api.com/ILobbyMatchmakingService/GetLobbyData/v1/',
-      {
-        params: {
-          key: process.env.STEAM_API_KEY,
-          appid: process.env.STEAM_APP_ID,
-          steamid_lobby: roomId,
+    try {
+      const response = await axios.get(
+        'https://partner.steam-api.com/ILobbyMatchmakingService/GetLobbyData/v1/',
+        {
+          params: {
+            key: process.env.STEAM_API_KEY,
+            appid: process.env.STEAM_APP_ID,
+            steamid_lobby: roomId,
+          },
         },
-      },
-    );
-    if (response.status === 200) {
-      const data = response.data.response.params;
-      const owner = data.steamid_owner as string;
-      const members = data.members as SteamUser[];
+      );
+      if (response.status === 200) {
+        const data = response.data.response.params;
+        const owner = data.steamid_owner as string;
+        const members = data.members as SteamUser[];
 
+        return {
+          success: true,
+          lobbyId: roomId,
+          owner: {
+            steamid: owner,
+          },
+          members: members.map((member) => ({
+            steamid: member.steamid,
+          })),
+        };
+      }
+    } catch {
       return {
-        success: true,
-        lobbyId: roomId,
-        owner: {
-          steamid: owner,
-        },
-        members: members.map((member) => ({
-          steamid: member.steamid,
-        })),
+        success: false,
       };
     }
-    return {
-      success: false,
-    };
   }
 }
