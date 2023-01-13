@@ -71,7 +71,7 @@ export class SteamService {
         },
       );
       if (response.status === 200) {
-        const data = response.data.response.params;
+        const data = response.data.response;
         const owner = data.steamid_owner as string;
         const members = data.members as SteamUser[];
 
