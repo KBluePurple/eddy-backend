@@ -15,4 +15,6 @@ async function bootstrap() {
   );
   await app.listen(3000);
 }
-bootstrap().then(() => console.log('Server started'));
+bootstrap().then(() => {
+  // Server Started
+});

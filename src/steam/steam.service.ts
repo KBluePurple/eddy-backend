@@ -85,8 +85,12 @@ export class SteamService {
             steamid: member.steamid,
           })),
         };
+      } else {
+        return {
+          success: false,
+        };
       }
-    } catch {
+    } catch (error) {
       return {
         success: false,
       };
